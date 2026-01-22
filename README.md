@@ -9,7 +9,7 @@ It is designed for GIS developers, analysts, and researchers who want clean, ext
 ---
 
 Badges
-- PyPI: ![PyPI](https://img.shields.io/pypi/v/geonest)
+- PyPI: ![PyPI]([[https://img.shields.io/pypi/v/geonest])
 - Python: ![Python](https://img.shields.io/pypi/pyversions/geonest)
 - License: ![License](https://img.shields.io/badge/license-MIT-blue)
 
