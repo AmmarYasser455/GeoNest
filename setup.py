@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="geonest",
-    version="0.1.0",
+    version="0.1.1",
     description="Interactive Python Map library for GIS using ipyleaflet",
     author="Ammar Yasser",
     author_email="ammaryasr522@gmail.com",
