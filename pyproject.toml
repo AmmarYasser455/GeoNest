@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geonest"
+version = "0.1.0"
+description = "Interactive Python mapping library for GIS using ipyleaflet"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Ammar Yasser Abdalazim", email = "ammaryasr522@gmail.com"}
+]
+maintainers = [
+    {name = "Ammar Yasser Abdalazim", email = "ammaryasr522@gmail.com"}
+]
+keywords = [
+    "gis",
+    "geospatial",
+    "mapping",
+    "leaflet",
+    "jupyter",
+    "ipyleaflet",
+    "interactive",
+    "visualization",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Framework :: Jupyter",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "ipyleaflet>=0.17.0",
+    "ipywidgets>=8.0.0",
+    "geopandas>=0.13.0",
+    "shapely>=2.1.0",
+    "localtileserver>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AmmarYasser455/GeoNest"
+Documentation = "https://github.com/AmmarYasser455/GeoNest#readme"
+Repository = "https://github.com/AmmarYasser455/GeoNest.git"
+Issues = "https://github.com/AmmarYasser455/GeoNest/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["geonest*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "D",   # pydocstyle
+]
+ignore = [
+    "D100",  # Missing docstring in public module
+    "D104",  # Missing docstring in public package
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.coverage.run]
+source = ["geonest"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
