@@ -251,15 +251,37 @@ class Map(ipyleaflet.Map):
             geojson = gdf.__geo_interface__
         elif isinstance(data, dict):
             geojson = data
+            if zoom_to_layer:
+                gdf = self._gdf_from_geojson(data)
         else:
             raise ValueError("GeoJSON data must be a file path or dict")
 
         layer = ipyleaflet.GeoJSON(data=geojson, hover_style=hover_style, **kwargs)
         self.add(layer)
 
-        if zoom_to_layer and gdf is not None:
+        if zoom_to_layer and gdf is not None and not gdf.empty:
             minx, miny, maxx, maxy = gdf.total_bounds
-            self.fit_bounds([[miny, minx], [maxy, maxx]])
+            if all(v == v for v in (minx, miny, maxx, maxy)):  # skip NaN bounds
+                self.fit_bounds([[miny, minx], [maxy, maxx]])
+
+    @staticmethod
+    def _gdf_from_geojson(data: dict) -> "gpd.GeoDataFrame | None":
+        """Build a GeoDataFrame from a GeoJSON dict to compute bounds.
+
+        Returns None if the dict cannot be interpreted as GeoJSON features.
+        """
+        import geopandas as gpd
+
+        try:
+            if data.get("type") == "Feature":
+                features = [data]
+            elif "features" in data:
+                features = data["features"]
+            else:  # bare geometry
+                features = [{"type": "Feature", "geometry": data, "properties": {}}]
+            return gpd.GeoDataFrame.from_features(features)
+        except Exception:
+            return None
 
     def add_gdf(self, gdf: "gpd.GeoDataFrame", **kwargs: Any) -> None:
         """
