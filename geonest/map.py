@@ -82,6 +82,14 @@ class Map(ipyleaflet.Map):
         except AttributeError:
             raise ValueError(f"Basemap '{basemap}' not found in ipyleaflet.basemaps")
 
+        # A provider group such as "Esri" has no tile URL of its own.
+        if not hasattr(provider, "build_url"):
+            raise ValueError(
+                f"Basemap '{basemap}' not found in ipyleaflet.basemaps: "
+                "it is a provider group, use a full name such as "
+                "'Esri.WorldImagery'"
+            )
+
         layer = ipyleaflet.TileLayer(
             url=provider.build_url(),
             name=basemap,
