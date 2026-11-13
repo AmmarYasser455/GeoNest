@@ -130,6 +130,23 @@ class TestVectorData:
         m.add_vector(geojson, zoom_to_layer=False)
         assert len(m.layers) >= 1
 
+    def test_add_geojson_dict_zooms_to_layer(self, sample_geojson, monkeypatch):
+        """Dict input should also fit the map to the data bounds by default."""
+        m = Map()
+        calls = []
+        monkeypatch.setattr(m, "fit_bounds", lambda b: calls.append(b))
+        m.add_geojson(sample_geojson)
+        assert calls == [[[30.0444, 29.9187], [31.2001, 31.2357]]]
+
+    def test_add_geojson_empty_dict_does_not_fail(self, monkeypatch):
+        """Empty collections must not attempt to fit NaN bounds."""
+        m = Map()
+        calls = []
+        monkeypatch.setattr(m, "fit_bounds", lambda b: calls.append(b))
+        m.add_geojson({"type": "FeatureCollection", "features": []})
+        assert calls == []
+        assert len(m.layers) >= 1
+
     def test_add_vector_invalid_type(self):
         """Test that invalid data type raises ValueError."""
         m = Map()
