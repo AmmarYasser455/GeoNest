@@ -58,6 +58,14 @@ class TestBasemaps:
         with pytest.raises(ValueError, match="not found"):
             m.add_basemap("NonExistentBasemap")
 
+    def test_add_basemap_provider_group_raises_value_error(self):
+        """A provider group like 'Esri' is not a tile layer; expect ValueError."""
+        m = Map()
+        n_layers = len(m.layers)
+        with pytest.raises(ValueError, match="not found"):
+            m.add_basemap("Esri")
+        assert len(m.layers) == n_layers
+
 
 class TestGoogleMaps:
     """Tests for Google Maps functionality."""
