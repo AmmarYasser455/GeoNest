@@ -277,8 +277,18 @@ class Map(ipyleaflet.Map):
             >>> m = Map()
             >>> m.add_gdf(gdf)
         """
+        import math
+
+        zoom_to_layer = kwargs.pop("zoom_to_layer", True)
         gdf = gdf.to_crs(epsg=4326)
-        self.add_geojson(gdf.__geo_interface__, **kwargs)
+        self.add_geojson(gdf.__geo_interface__, zoom_to_layer=False, **kwargs)
+
+        if zoom_to_layer and not gdf.empty:
+            bounds = [float(b) for b in gdf.total_bounds]
+            # All-null/empty geometries yield NaN bounds; skip fitting then.
+            if all(math.isfinite(b) for b in bounds):
+                minx, miny, maxx, maxy = bounds
+                self.fit_bounds([[miny, minx], [maxy, maxx]])
 
     def add_vector(
         self,
