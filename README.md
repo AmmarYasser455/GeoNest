@@ -93,6 +93,14 @@ m.add_google_map("SATELLITE")
 
 ---
 
+## 🖼️ Showcase
+
+Egypt's governorates by area, built from Natural Earth data with `Map.add_gdf`:
+
+![map](showcase/map.png)
+
+See [showcase/](showcase/) for the report, the [web map](showcase/index.html), the [notebook](showcase/showcase.ipynb) and the [GeoJSON](showcase/map.geojson).
+
 ## 📚 API Reference
 
 ### `Map` Class

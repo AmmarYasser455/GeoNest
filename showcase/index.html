@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GeoNest showcase: Egypt's governorates by area</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+ body{margin:0;font-family:sans-serif}
+ header{padding:8px 14px}
+ h1{font-size:1.2em;margin:0 0 4px}
+ p{margin:2px 0;font-size:.9em}
+ #map{height:calc(100vh - 110px)}
+</style>
+</head>
+<body>
+<header>
+<h1>Egypt's governorates by area</h1>
+<p>Polygons are Natural Earth admin-1 boundaries; areas are computed in an equal-area projection (EPSG:6933) and the layer is prepared with GeoNest.</p>
+<p>Darker means larger. Click a governorate for its area, share and rank. Source code: <a href="https://github.com/AmmarYasser455/GeoNest">GeoNest on GitHub</a>.</p>
+</header>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var map = L.map('map');
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Data: Natural Earth'
+}).addTo(map);
+function color(a){return a>200000?'#08306b':a>80000?'#2171b5':a>20000?'#6baed6':a>5000?'#bdd7e7':'#eff3ff';}
+fetch('map.geojson').then(function(r){return r.json();}).then(function(fc){
+  var layer = L.geoJSON(fc, {
+    style: function(f){return {color:'#fff',weight:1,fillColor:color(f.properties.area_km2),fillOpacity:0.75};},
+    onEachFeature: function(f, l){
+      var p = f.properties;
+      l.bindPopup('<b>'+p.name+'</b><br>Area: '+p.area_km2.toLocaleString()+' km²<br>Share of Egypt: '+p.share_pct+'%<br>Rank: '+p.rank+' of 27<br>ISO 3166-2: '+p.iso_3166_2);
+    }
+  }).addTo(map);
+  map.fitBounds(layer.getBounds());
+});
+</script>
+</body>
+</html>
