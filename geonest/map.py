@@ -8,6 +8,7 @@ Author: Ammar Yasser Abdalazim
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING, Any, Literal
 
 import ipyleaflet
@@ -226,7 +227,7 @@ class Map(ipyleaflet.Map):
 
     def add_geojson(
         self,
-        data: str | dict,
+        data: str | os.PathLike | dict,
         zoom_to_layer: bool = True,
         hover_style: dict | None = None,
         **kwargs: Any,
@@ -254,8 +255,17 @@ class Map(ipyleaflet.Map):
 
         gdf = None
 
+        if isinstance(data, os.PathLike):
+            data = os.fspath(data)
+
         if isinstance(data, str):
-            gdf = gpd.read_file(data).to_crs(epsg=4326)
+            gdf = gpd.read_file(data)
+            if gdf.crs is None:
+                raise ValueError(
+                    f"{data!r} has no CRS; GeoNest will not guess one. Read it "
+                    "with geopandas, call set_crs(...) and pass it to add_gdf."
+                )
+            gdf = gdf.to_crs(epsg=4326)
             geojson = gdf.__geo_interface__
         elif isinstance(data, dict):
             geojson = data
@@ -340,7 +350,7 @@ class Map(ipyleaflet.Map):
         """
         import geopandas as gpd
 
-        if isinstance(data, str):
+        if isinstance(data, (str, os.PathLike)):
             self.add_geojson(data, **kwargs)
         elif isinstance(data, gpd.GeoDataFrame):
             self.add_gdf(data, **kwargs)
