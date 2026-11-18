@@ -320,6 +320,11 @@ class Map(ipyleaflet.Map):
         import math
 
         zoom_to_layer = kwargs.pop("zoom_to_layer", True)
+        if gdf.crs is None:
+            raise ValueError(
+                "GeoDataFrame has no CRS; GeoNest will not guess one. Call "
+                "gdf.set_crs(...) with the correct CRS first."
+            )
         gdf = gdf.to_crs(epsg=4326)
         self.add_geojson(gdf.__geo_interface__, zoom_to_layer=False, **kwargs)
 
