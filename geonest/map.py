@@ -148,13 +148,19 @@ class Map(ipyleaflet.Map):
         def on_close(_: Any) -> None:
             container.close()
 
+        selected: list[Any] = []  # basemap layer added by this selector
+
         def on_change(change: dict) -> None:
             new_basemap = change["new"]
             if new_basemap:
-                # Remove the last added basemap layer (not the default base)
-                if len(self.layers) > 1:
-                    self.remove(self.layers[-1])
+                # Only replace the layer this selector added; never remove
+                # user data layers or other layers added to the map.
+                for layer in selected:
+                    if layer in self.layers:
+                        self.remove(layer)
+                selected.clear()
                 self.add_basemap(new_basemap)
+                selected.append(self.layers[-1])
 
         toggle.observe(on_toggle, names="value")
         close_btn.on_click(on_close)
