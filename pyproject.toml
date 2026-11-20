@@ -1,13 +1,14 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "geonest"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Interactive Python mapping library for GIS using ipyleaflet"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "Ammar Yasser Abdalazim", email = "ammaryasr522@gmail.com"}
 ]
@@ -28,7 +29,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -68,6 +68,9 @@ Issues = "https://github.com/AmmarYasser455/GeoNest/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["geonest*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "geonest.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

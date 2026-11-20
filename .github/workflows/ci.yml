@@ -26,3 +26,39 @@ jobs:
           python -m pip install -e .[dev]
       - name: Run tests
         run: python -m pytest
+
+  package:
+    # Build the wheel and sdist, install the wheel in a clean venv, and run the
+    # README quick start from outside the repo, as a user would after pip install.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - name: Wheel contains only the geonest package
+        run: |
+          python - <<'PY'
+          import glob, zipfile
+          names = zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist()
+          tops = {n.split("/")[0] for n in names if not n.split("/")[0].endswith(".dist-info")}
+          print(sorted(names))
+          assert tops == {"geonest"}, tops
+          PY
+      - name: Install the wheel in a clean venv and run the quick start
+        run: |
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/venv/bin/python - <<'PY'
+          import geonest
+          from geonest import Map
+          m = Map(center=[30.0, 31.0], zoom=6)
+          m.add_basemap("OpenTopoMap")
+          print("geonest", geonest.__version__, "quick start OK")
+          PY

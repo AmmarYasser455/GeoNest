@@ -7,7 +7,7 @@ visualization in Jupyter environments.
 
 __author__ = "Ammar Yasser Abdalazim"
 __email__ = "ammaryasr522@gmail.com"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .map import Map
 
