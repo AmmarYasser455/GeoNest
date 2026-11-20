@@ -29,7 +29,15 @@
 
 ## 🚀 Installation
 
-### From PyPI (recommended)
+### From GitHub (recommended for now)
+
+```bash
+pip install git+https://github.com/AmmarYasser455/GeoNest
+```
+
+> **Note:** the `geonest` 0.1.0 package on PyPI has a packaging bug: `from geonest import Map` fails with `ModuleNotFoundError`. Install from GitHub until the next PyPI release.
+
+### From PyPI
 
 ```bash
 pip install geonest
