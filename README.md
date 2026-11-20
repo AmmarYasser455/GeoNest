@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/logo.png" alt="GeoNest logo" width="112">
+</p>
+
 # GeoNest 🗺️
 
 **GeoNest** is a lightweight, Pythonic mapping library built on top of [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) to simplify interactive geospatial visualization in Jupyter environments.
