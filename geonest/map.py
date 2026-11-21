@@ -274,6 +274,7 @@ class Map(ipyleaflet.Map):
             gdf = gdf.to_crs(epsg=4326)
             geojson = self._gdf_to_geojson(gdf)
         elif isinstance(data, dict):
+            self._check_geojson_crs(data)
             geojson = data
             if zoom_to_layer:
                 gdf = self._gdf_from_geojson(data)
@@ -307,6 +308,44 @@ class Map(ipyleaflet.Map):
 
         text = json.dumps(gdf.__geo_interface__, default=default)
         return json.loads(text, parse_constant=lambda _c: None)
+
+    @staticmethod
+    def _check_geojson_crs(data: dict) -> None:
+        """Reject GeoJSON dicts that declare a CRS other than WGS84 lon/lat.
+
+        RFC 7946 GeoJSON is always WGS84 (x=lon, y=lat), but legacy files may
+        carry a ``crs`` member. Plotting such coordinates as-is would place
+        features at the wrong location, so a non-WGS84 declaration is an error.
+        """
+        crs = data.get("crs")
+        if crs is None:
+            return
+        name = None
+        if isinstance(crs, dict):
+            props = crs.get("properties")
+            if isinstance(props, dict):
+                name = props.get("name")
+        if not isinstance(name, str) or not name:
+            raise ValueError(
+                "GeoJSON declares a CRS that cannot be interpreted (for example "
+                "a linked CRS without properties.name); dict input must be "
+                "WGS84 lon/lat. Load it into a GeoDataFrame, set_crs(...) and "
+                "pass it to add_gdf, which reprojects."
+            )
+        from pyproj import CRS
+
+        try:
+            declared = CRS.from_user_input(name)
+        except Exception:
+            raise ValueError(f"GeoJSON declares an unrecognised CRS {name!r}")
+        wgs84_lonlat = (CRS.from_epsg(4326), CRS.from_user_input("OGC:CRS84"))
+        if not any(declared == w or declared.equals(w, ignore_axis_order=True)
+                   for w in wgs84_lonlat):
+            raise ValueError(
+                f"GeoJSON declares CRS {name!r}, but dict input must be "
+                "WGS84 lon/lat. Load it into a GeoDataFrame, set_crs(...) and "
+                "pass it to add_gdf, which reprojects."
+            )
 
     @staticmethod
     def _gdf_from_geojson(data: dict) -> "gpd.GeoDataFrame | None":
