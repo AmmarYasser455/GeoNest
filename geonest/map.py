@@ -272,7 +272,7 @@ class Map(ipyleaflet.Map):
                     "with geopandas, call set_crs(...) and pass it to add_gdf."
                 )
             gdf = gdf.to_crs(epsg=4326)
-            geojson = gdf.__geo_interface__
+            geojson = self._gdf_to_geojson(gdf)
         elif isinstance(data, dict):
             geojson = data
             if zoom_to_layer:
@@ -287,6 +287,26 @@ class Map(ipyleaflet.Map):
             minx, miny, maxx, maxy = gdf.total_bounds
             if all(v == v for v in (minx, miny, maxx, maxy)):  # skip NaN bounds
                 self.fit_bounds([[miny, minx], [maxy, maxx]])
+
+    @staticmethod
+    def _gdf_to_geojson(gdf: "gpd.GeoDataFrame") -> dict:
+        """Convert a GeoDataFrame to a JSON-safe GeoJSON dict.
+
+        ``__geo_interface__`` keeps Timestamps and numpy scalars, which the
+        widget cannot serialize. They are converted here (datetimes to ISO
+        strings, numpy scalars to Python values, NaN/Infinity to null).
+        """
+        import json
+
+        def default(obj: Any) -> Any:
+            if hasattr(obj, "isoformat"):
+                return obj.isoformat()
+            if hasattr(obj, "item"):
+                return obj.item()
+            return str(obj)
+
+        text = json.dumps(gdf.__geo_interface__, default=default)
+        return json.loads(text, parse_constant=lambda _c: None)
 
     @staticmethod
     def _gdf_from_geojson(data: dict) -> "gpd.GeoDataFrame | None":
@@ -332,7 +352,7 @@ class Map(ipyleaflet.Map):
                 "gdf.set_crs(...) with the correct CRS first."
             )
         gdf = gdf.to_crs(epsg=4326)
-        self.add_geojson(gdf.__geo_interface__, zoom_to_layer=False, **kwargs)
+        self.add_geojson(self._gdf_to_geojson(gdf), zoom_to_layer=False, **kwargs)
 
         if zoom_to_layer and not gdf.empty:
             bounds = [float(b) for b in gdf.total_bounds]
